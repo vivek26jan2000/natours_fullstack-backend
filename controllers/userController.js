@@ -1,5 +1,7 @@
 const multer = require('multer');
 const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
@@ -59,15 +61,10 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     );
   }
 
-  // console.log(req.file);
-  let fileUrl = '';
   // 2) Filtered out unwanted fields names that are not allowed to be updated
   const filteredBody = filterObj(req.body, 'name', 'email');
   if (req.file) {
     filteredBody.photo = req.file.filename;
-    fileUrl = `${req.protocol}://${req.get('host')}/public/img/users/${
-      req.file.filename
-    }`;
   }
 
   // 3) Update user document
@@ -79,10 +76,22 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: {
-      user: updatedUser,
-      fileUrl
+      user: updatedUser
     }
   });
+});
+
+exports.getStoreImg = catchAsync(async (req, res, next) => {
+  const { imageId } = req.params;
+
+  const imagePath = path.join(__dirname, '../public/img/users/', `${imageId}`); // Adjust the file extension based on your image type
+
+  // Check if the image file exists
+  if (fs.existsSync(imagePath)) {
+    res.status(200).sendFile(imagePath);
+  } else {
+    res.status(404).send('Image not found');
+  }
 });
 
 exports.getCurrentUser = catchAsync(async (req, res, next) => {

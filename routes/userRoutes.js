@@ -11,9 +11,6 @@ router.get('/logout', authController.logout);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
-// get image
-router.get('/images/:imageId', userController.getStoreImg);
-
 router.get('/currentUser/:userId', userController.getCurrentUser);
 
 // Protect all routes after this middleware
@@ -29,6 +26,9 @@ router.patch(
 );
 
 router.delete('/deleteMe', userController.deleteMe);
+
+// get image
+router.get('/images/:imageId', userController.getStoreImg);
 
 router.use(authController.restrictTo('admin'));
 
